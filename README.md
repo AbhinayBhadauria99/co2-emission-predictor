@@ -3,6 +3,8 @@
 A machine learning-based web application to predict average CO2 emission of an individual.
 <video controls src="2025-03-16 21-38-52.mp4" title="Title"></video>
 
+![alt text](image-1.png)
+
 ## Introduction
 
 This project aims to estimate the average carbon footprint of an individual based on their lifestyle and habits. We use a Gradient Boosting Regressor to make predictions and provide a user-friendly interface to collect data and display results.

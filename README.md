@@ -1,3 +1,9 @@
+# Deployment Links
+With Optimised Frontend:
+https://carbonx-delta.vercel.app/
+With Unoptimised Frontend:
+https://co2-emission-predictor.vercel.app/
+
 # Carbon Emission Predictor
 
 A machine learning-based web application to predict average CO2 emission of an individual.

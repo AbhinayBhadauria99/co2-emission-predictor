@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import MinMaxScaler
 import joblib
+import numpy as np
 
 # Load the trained model and scaler
 try:
@@ -15,7 +16,6 @@ except Exception as e:
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
-
 
 # Add CORS middleware
 app.add_middleware(
@@ -51,9 +51,14 @@ def predict_emission(user_input: UserInput):
     try:
         # Convert user input to DataFrame
         input_data = pd.DataFrame([user_input.dict()])
-
+        
         # One-hot encode categorical variables
-        input_data = pd.get_dummies(input_data)
+        categorical_columns = [
+            'Body_Type', 'Sex', 'Diet', 'How_Often_Shower', 'Heating_Energy_Source', 
+            'Transport', 'Vehicle_Type', 'Social_Activity', 'Frequency_of_Traveling_by_Air', 
+            'Waste_Bag_Size', 'Energy_efficiency'
+        ]
+        input_data = pd.get_dummies(input_data, columns=categorical_columns)
 
         # Ensure the input data has the same columns as the training data
         input_data = input_data.reindex(columns=columns, fill_value=0)
@@ -63,7 +68,15 @@ def predict_emission(user_input: UserInput):
             'Monthly_Grocery_Bill', 'Vehicle_Monthly_Distance_Km', 'Waste_Bag_Weekly_Count',
             'How_Long_TV_PC_Daily_Hour', 'How_Many_New_Clothes_Monthly', 'How_Long_Internet_Daily_Hour'
         ]
-        input_data[numerical_columns] = scaler.transform(input_data[numerical_columns])
+        
+        # Check if numerical columns exist in input data
+        existing_numerical_columns = [col for col in numerical_columns if col in input_data.columns]
+        
+        # Scale numerical columns
+        if existing_numerical_columns:
+            input_data[existing_numerical_columns] = scaler.transform(input_data[existing_numerical_columns])
+        else:
+            print("No numerical columns found in input data.")
 
         # Make prediction
         prediction = gbr_model.predict(input_data)[0] * 10000
@@ -82,6 +95,3 @@ def predict_emission(user_input: UserInput):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# To run the server, use the following command:
-# uvicorn main:app --reload
